@@ -2,11 +2,11 @@ name 'Terraform Stack'
 rs_ca_ver 20161221
 short_description "![logo](https://avatars2.githubusercontent.com/u/11051457?v=4&s=64)
 
-Terraform-defined infrastructure with automated operations"
+Terraform-defined infrastructure with state preservation and audited workflow for policy compliance"
 
 long_description "### Description
 
-This CloudApp creates and automates the operation of resources defined in Terraform
+This CloudApp provides state preservation, an audited workflow, and enforced policy compliance for resources defined in Terraform
 
 ---"
 
@@ -43,8 +43,8 @@ end
 # Outputs returned to the user #
 ################################
 
-output "out_report" do
-  label "Last Output"
+output "out_last_ran" do
+  label "Last Ran At"
   category "Terraform"
 end
 
@@ -53,8 +53,8 @@ output "out_last_action" do
   category "Terraform"
 end
 
-output "out_last_ran" do
-  label "Last Ran At"
+output "out_report" do
+  label "Last Output"
   category "Terraform"
 end
 

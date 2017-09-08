@@ -27,27 +27,21 @@
 #     Required: true
 #     Advanced: true
 #     Default: cred:GITHUB_TOKEN
-# Attachments: []
+# Attachments:
+# - functions.sh
 # ...
 set -euo pipefail
 IFS=$'\n\t'
-cd ~
 
+# shellcheck source=attachments/functions.sh
+source "$RS_ATTACH_DIR/functions.sh"
+
+# policy variables may be passed into terraform
 echo "Cost Center: $COST_CENTER"
 
-auth_git_repo=${GIT_REPO:0:8}adamalex:${GITHUB_TOKEN}@${GIT_REPO:8}
-git clone --depth=10 --branch="$BRANCH_NAME" "$auth_git_repo" terraform
+# Execute terraform action
+log_start
+terraform_action "destroy" "-force"
+log_end
 
-(
-  cd terraform || exit 1
-  terraform init -no-color
-  terraform validate -no-color
-  terraform refresh -no-color
-  terraform destroy -force -no-color
-
-  git add .
-  git commit -m "Update Terraform state after destroy"
-  git push origin "$BRANCH_NAME"
-)
-
-rm -rf terraform
+rs_tag "rs:terraform_out_url=$(gist_create "destroy")"

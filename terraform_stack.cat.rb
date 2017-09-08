@@ -20,16 +20,18 @@ parameter "param_git_repo" do
   type "string"
   label "Git Repo"
   category "Settings"
+  default "https://github.com/adamalex/terraform_sample.git"
 end
 
 parameter "param_branch_name" do
   type "string"
   label "Branch"
   category "Settings"
+  default "master"
 end
 
 parameter "param_costcenter" do 
-  category "Deployment Options"
+  category "Accounting"
   label "Cost Center" 
   type "string" 
   allowed_values "Development", "QA", "Production"
@@ -109,7 +111,7 @@ end
 # DEFINITIONS (i.e. RCL) #
 ##########################
 
-define plan(@utility, $param_git_repo, $param_branch_name) return @utility, $plan_report, $last_run_time do
+define plan(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $plan_report, $last_run_time do
   call rs_st.run_script_inputs(@utility, "Terraform Plan", {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,
@@ -122,7 +124,7 @@ define plan(@utility, $param_git_repo, $param_branch_name) return @utility, $pla
   $plan_report = "(gist link)"
 end
 
-define apply(@utility, $param_git_repo, $param_branch_name) return @utility, $apply_report, $last_run_time do
+define apply(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $apply_report, $last_run_time do
   call rs_st.run_script_inputs(@utility, "Terraform Apply", {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,

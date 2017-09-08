@@ -26,7 +26,17 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+echo "Cost Center: $COST_CENTER"
 echo "Running terraform plan..."
-echo $GIT_REPO
-echo $BRANCH_NAME
-echo $COST_CENTER
+
+git clone --depth=10 --branch="$BRANCH_NAME" "$GIT_REPO" terraform
+
+(
+  cd terraform || exit
+  terraform validate
+  terraform init
+  terraform refresh
+  terraform plan
+)
+
+rm -rf terraform

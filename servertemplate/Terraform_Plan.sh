@@ -30,10 +30,3 @@ echo "Running terraform plan..."
 echo $GIT_REPO
 echo $BRANCH_NAME
 echo $COST_CENTER
-
-cat > ~/.aws/credentials <<EOF
-[default]
-aws_access_key_id=${test}
-aws_secret_access_key=${test2}
-
-EOF

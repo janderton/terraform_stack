@@ -1,7 +1,7 @@
 #!/bin/bash
 # ---
 # RightScript Name: Terraform Apply
-# Description: Installs Terraform
+# Description: Runs terraform apply
 # Inputs:
 #   BRANCH_NAME:
 #     Category: Application
@@ -21,12 +21,33 @@
 #     Input Type: single
 #     Required: true
 #     Advanced: false
+#   GITHUB_TOKEN:
+#     Category: Application
+#     Input Type: single
+#     Required: true
+#     Advanced: true
+#     Default: cred:GITHUB_TOKEN
 # Attachments: []
 # ...
 set -euo pipefail
 IFS=$'\n\t'
+cd ~
 
-echo "Running terraform apply..."
-echo $GIT_REPO
-echo $BRANCH_NAME
-echo $COST_CENTER
+echo "Cost Center: $COST_CENTER"
+
+auth_git_repo=${GIT_REPO:0:8}adamalex:${GITHUB_TOKEN}@${GIT_REPO:8}
+git clone --depth=10 --branch="$BRANCH_NAME" "$auth_git_repo" terraform
+
+(
+  cd terraform || exit 1
+  terraform init -no-color
+  terraform validate -no-color
+  terraform refresh -no-color
+  terraform apply -no-color
+
+  git add .
+  git commit -m "Update Terraform state after apply"
+  git push origin "$BRANCH_NAME"
+)
+
+rm -rf terraform

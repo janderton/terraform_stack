@@ -1,7 +1,7 @@
 #!/bin/bash
 # ---
-# RightScript Name: Terraform Plan
-# Description: Runs terraform plan
+# RightScript Name: Terraform Destroy
+# Description: Runs terraform destroy
 # Inputs:
 #   BRANCH_NAME:
 #     Category: Application
@@ -43,10 +43,10 @@ git clone --depth=10 --branch="$BRANCH_NAME" "$auth_git_repo" terraform
   terraform init -no-color
   terraform validate -no-color
   terraform refresh -no-color
-  terraform plan -no-color
+  terraform destroy -force -no-color
 
   git add .
-  git commit -m "Update Terraform state after plan"
+  git commit -m "Update Terraform state after destroy"
   git push origin "$BRANCH_NAME"
 )
 

@@ -43,18 +43,18 @@ end
 # Outputs returned to the user #
 ################################
 
-output "out_plan_report" do
-  label "Plan Report"
+output "out_report" do
+  label "Last Output"
   category "Terraform"
 end
 
-output "out_apply_report" do
-  label "Apply Report"
+output "out_last_action" do
+  label "Last Action"
   category "Terraform"
 end
 
-output "out_last_run_time" do
-  label "Last Run Time"
+output "out_last_ran" do
+  label "Last Ran At"
   category "Terraform"
 end
 
@@ -88,9 +88,9 @@ operation 'terraform_plan' do
   description 'Show execution plan for applying the current config'
   definition 'plan'
   output_mappings do {
-    $out_plan_report => $plan_report,
-    $out_apply_report => null,
-    $out_last_run_time => $last_run_time,
+    $out_report => $report,
+    $out_last_action => 'Plan',
+    $out_last_ran => $last_ran,
     $out_message => null
   } end
 end
@@ -100,9 +100,21 @@ operation 'terraform_apply' do
   description 'Apply the current configuration to the infrastructure'
   definition 'apply'
   output_mappings do {
-    $out_plan_report => null,
-    $out_apply_report => $apply_report,
-    $out_last_run_time => $last_run_time,
+    $out_report => $report,
+    $out_last_action => 'Apply',
+    $out_last_ran => $last_ran,
+    $out_message => null
+  } end
+end
+
+operation 'terraform_destroy' do
+  label 'Terraform Destroy'
+  description 'Destroy the infrastructure provisioned by the configuration'
+  definition 'destroy'
+  output_mappings do {
+    $out_report => $report,
+    $out_last_action => 'Destroy',
+    $out_last_ran => $last_ran,
     $out_message => null
   } end
 end
@@ -111,7 +123,7 @@ end
 # DEFINITIONS (i.e. RCL) #
 ##########################
 
-define plan(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $plan_report, $last_run_time do
+define plan(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
   call rs_st.run_script_inputs(@utility, "Terraform Plan", {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,
@@ -120,11 +132,11 @@ define plan(@utility, $param_git_repo, $param_branch_name, $param_costcenter) re
 
   # $aws_acct_id = tag_value(@creator.current_instance(), "rs:aws_acct_id")
   # $rs_acct_id = tag_value(@creator.current_instance(), "rs:rs_acct_id")
-  $last_run_time = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
-  $plan_report = "(gist link)"
+  $last_ran = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
+  $report = "(gist link)"
 end
 
-define apply(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $apply_report, $last_run_time do
+define apply(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
   call rs_st.run_script_inputs(@utility, "Terraform Apply", {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,
@@ -133,6 +145,19 @@ define apply(@utility, $param_git_repo, $param_branch_name, $param_costcenter) r
 
   # $aws_acct_id = tag_value(@creator.current_instance(), "rs:aws_acct_id")
   # $rs_acct_id = tag_value(@creator.current_instance(), "rs:rs_acct_id")
-  $last_run_time = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
-  $apply_report = "(gist link)"
+  $last_ran = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
+  $report = "(gist link)"
+end
+
+define destroy(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
+  call rs_st.run_script_inputs(@utility, "Terraform Destroy", {
+    GIT_REPO: 'text:' + $param_git_repo,
+    BRANCH_NAME: 'text:' + $param_branch_name,
+    COST_CENTER: 'text:' + $param_costcenter
+  })
+
+  # $aws_acct_id = tag_value(@creator.current_instance(), "rs:aws_acct_id")
+  # $rs_acct_id = tag_value(@creator.current_instance(), "rs:rs_acct_id")
+  $last_ran = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
+  $report = "(gist link)"
 end

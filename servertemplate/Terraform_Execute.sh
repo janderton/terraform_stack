@@ -1,7 +1,7 @@
 #!/bin/bash
 # ---
-# RightScript Name: Terraform Apply
-# Description: Runs terraform apply
+# RightScript Name: Terraform Execute
+# Description: Executes a controlled terraform action, preserving state and recording for auditing purposes
 # Inputs:
 #   BRANCH_NAME:
 #     Category: Application
@@ -27,6 +27,12 @@
 #     Required: true
 #     Advanced: true
 #     Default: cred:GITHUB_TOKEN
+#   TERRAFORM_ACTION:
+#     Category: Application
+#     Description: Terraform action to be executed
+#     Input Type: single
+#     Required: true
+#     Advanced: false
 # Attachments:
 # - functions.sh
 # ...
@@ -36,12 +42,13 @@ IFS=$'\n\t'
 # shellcheck source=attachments/functions.sh
 source "$RS_ATTACH_DIR/functions.sh"
 
-# policy variables may be passed into terraform
+# Policy-related or other custom variables may be used from within terraform
 echo "Cost Center: $COST_CENTER"
 
 # Execute terraform action
 log_start
-terraform_action "apply" ""
+terraform_action "$TERRAFORM_ACTION"
 log_end
 
-rs_tag "rs:terraform_out_url=$(gist_create "apply")"
+# Create gist and store in an instance tag
+instance_tag "rs:terraform_out_url=$(gist_create "$TERRAFORM_ACTION")"

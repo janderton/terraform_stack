@@ -12,7 +12,7 @@ log_end() {
   exec 1>&6 6>&-
 }
 
-rs_tag() {
+instance_tag() {
   echo "Applying tag [$1] to instance..."
   while true; do
     rsc --rl10 cm15 multi_add /api/tags/multi_add "resource_hrefs[]=$RS_SELF_HREF" "tags[]=$1"
@@ -29,16 +29,25 @@ rs_tag() {
 
 terraform_action() {
   cd ~
+
   rm -rf terraform
   auth_git_repo=${GIT_REPO:0:8}adamalex:${GITHUB_TOKEN}@${GIT_REPO:8}
-  git clone --depth=10 --branch="$BRANCH_NAME" "$auth_git_repo" terraform
+  git clone --depth=1 --branch="$BRANCH_NAME" "$auth_git_repo" terraform
 
   (
     cd terraform || exit 1
     terraform init -no-color
     terraform validate -no-color
     terraform refresh -no-color
-    terraform "$1" "$2" -no-color
+
+    case $1 in
+    "destroy")
+      terraform destroy -force -no-color
+      ;;
+    *)
+      terraform "$1" -no-color
+      ;;
+    esac
 
     if [ ! -z "$(git status --porcelain)" ]; then 
       git add .
@@ -51,9 +60,9 @@ terraform_action() {
 }
 
 gist_create() {
-jq -n --arg action "$1" --arg log "$(cat "/tmp/terraform_out.txt")" "$(cat <<'END'
+jq -n --arg desc "Output from Terraform $1" --arg log "$(cat "/tmp/terraform_out.txt")" "$(cat <<'END'
 {
-  "description": "Output from Terraform $action",
+  "description": $desc,
   "public": false,
   "files": {
     "terraform_out.txt": {

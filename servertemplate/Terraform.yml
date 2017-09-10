@@ -12,9 +12,7 @@ RightScripts:
   Decommission:
   - RL10_Windows_Shutdown_Reason
   Operational:
-  - Terraform_Apply.sh
-  - Terraform_Destroy.sh
-  - Terraform_Plan.sh
+  - Terraform_Execute.sh
 MultiCloudImages:
 - Name: PFT Base Linux MCI
 Alerts:

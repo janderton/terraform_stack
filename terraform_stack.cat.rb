@@ -2,11 +2,11 @@ name 'Terraform Stack'
 rs_ca_ver 20161221
 short_description "![logo](https://avatars2.githubusercontent.com/u/11051457?v=4&s=64)
 
-Terraform-defined infrastructure with state preservation and audited workflow for policy compliance"
+Terraform-defined infrastructure stack with state preservation and audited workflow for centralized policy compliance"
 
 long_description "### Description
 
-This CloudApp provides state preservation, an audited workflow, and enforced policy compliance for resources defined in Terraform
+This CloudApp provides state preservation, an audited workflow, and centralized policy compliance for an infrastructure stack defined in Terraform
 
 ---"
 
@@ -54,14 +54,14 @@ output "out_last_action" do
 end
 
 output "out_report" do
-  label "Last Output"
+  label "Last Action Log"
   category "Terraform"
 end
 
 output "out_message" do
   label "Message"
   category "Terraform"
-  default_value 'Ready to build infrastructure for this stack. Use the Terraform Apply action to build the infrastructure, or Terraform Plan to preview what will be built'
+  default_value 'Ready to build the infrastructure for this stack. Use the action Terraform Plan to preview and validate what will be built, then Terraform Apply to build the infrastructure'
 end
 
 ############################
@@ -124,40 +124,37 @@ end
 ##########################
 
 define plan(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
-  call rs_st.run_script_inputs(@utility, "Terraform Plan", {
+  call rs_st.run_script_inputs(@utility, "Terraform Execute", {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,
-    COST_CENTER: 'text:' + $param_costcenter
+    COST_CENTER: 'text:' + $param_costcenter,
+    TERRAFORM_ACTION: 'text:plan'
   })
 
-  # $aws_acct_id = tag_value(@creator.current_instance(), "rs:aws_acct_id")
-  # $rs_acct_id = tag_value(@creator.current_instance(), "rs:rs_acct_id")
-  $last_ran = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
-  $report = "(gist link)"
+  $report = tag_value(@utility.current_instance(), "rs:terraform_out_url")
+  $last_ran = strftime(now(), "%Y-%m-%d %H:%M:%S UTC")
 end
 
 define apply(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
-  call rs_st.run_script_inputs(@utility, "Terraform Apply", {
+  call rs_st.run_script_inputs(@utility, "Terraform Execute", {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,
-    COST_CENTER: 'text:' + $param_costcenter
+    COST_CENTER: 'text:' + $param_costcenter,
+    TERRAFORM_ACTION: 'text:apply'
   })
 
-  # $aws_acct_id = tag_value(@creator.current_instance(), "rs:aws_acct_id")
-  # $rs_acct_id = tag_value(@creator.current_instance(), "rs:rs_acct_id")
-  $last_ran = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
-  $report = "(gist link)"
+  $report = tag_value(@utility.current_instance(), "rs:terraform_out_url")
+  $last_ran = strftime(now(), "%Y-%m-%d %H:%M:%S UTC")
 end
 
 define destroy(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
-  call rs_st.run_script_inputs(@utility, "Terraform Destroy", {
+  call rs_st.run_script_inputs(@utility, "Terraform Execute", {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,
-    COST_CENTER: 'text:' + $param_costcenter
+    COST_CENTER: 'text:' + $param_costcenter,
+    TERRAFORM_ACTION: 'text:destroy'
   })
 
-  # $aws_acct_id = tag_value(@creator.current_instance(), "rs:aws_acct_id")
-  # $rs_acct_id = tag_value(@creator.current_instance(), "rs:rs_acct_id")
-  $last_ran = strftime(now(), "%Y/%m/%d %H:%M:%S UTC")
-  $report = "(gist link)"
+  $report = tag_value(@utility.current_instance(), "rs:terraform_out_url")
+  $last_ran = strftime(now(), "%Y-%m-%d %H:%M:%S UTC")
 end

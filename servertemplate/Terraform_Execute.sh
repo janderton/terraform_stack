@@ -3,6 +3,30 @@
 # RightScript Name: Terraform Execute
 # Description: Executes a controlled terraform action, preserving state and recording for auditing purposes
 # Inputs:
+#   ARM_CLIENT_ID:
+#     Category: Application
+#     Input Type: single
+#     Required: true
+#     Advanced: true
+#     Default: cred:ADAMALEX_ARM_CLIENT_ID
+#   ARM_CLIENT_SECRET:
+#     Category: Application
+#     Input Type: single
+#     Required: true
+#     Advanced: true
+#     Default: cred:ADAMALEX_ARM_CLIENT_SECRET
+#   ARM_SUBSCRIPTION_ID:
+#     Category: Application
+#     Input Type: single
+#     Required: true
+#     Advanced: true
+#     Default: cred:ADAMALEX_ARM_SUBSCRIPTION_ID
+#   ARM_TENANT_ID:
+#     Category: Application
+#     Input Type: single
+#     Required: true
+#     Advanced: true
+#     Default: cred:ADAMALEX_ARM_TENANT_ID
 #   BRANCH_NAME:
 #     Category: Application
 #     Description: Branch to be used from git repo

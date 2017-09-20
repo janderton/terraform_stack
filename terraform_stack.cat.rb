@@ -83,6 +83,11 @@ end
 # OPERATIONS       #
 ####################
 
+operation 'launch' do
+  description 'Launch the application'
+  definition 'launch'
+end
+
 operation 'terraform_plan' do
   label 'Terraform Plan'
   description 'Show execution plan for applying the current config'
@@ -123,36 +128,29 @@ end
 # DEFINITIONS (i.e. RCL) #
 ##########################
 
-define plan(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
-  call rs_st.run_script_inputs(@utility, "Terraform Execute", {
+define launch($param_git_repo, $param_branch_name, $param_costcenter) do
+  @@deployment.multi_update_inputs(inputs: {
     GIT_REPO: 'text:' + $param_git_repo,
     BRANCH_NAME: 'text:' + $param_branch_name,
-    COST_CENTER: 'text:' + $param_costcenter,
-    TERRAFORM_ACTION: 'text:plan'
+    COST_CENTER: 'text:' + $param_costcenter
   })
-
-  $report = tag_value(@utility.current_instance(), "rs:terraform_out_url")
-  $last_ran = strftime(now(), "%Y-%m-%d %H:%M:%S UTC")
 end
 
-define apply(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
-  call rs_st.run_script_inputs(@utility, "Terraform Execute", {
-    GIT_REPO: 'text:' + $param_git_repo,
-    BRANCH_NAME: 'text:' + $param_branch_name,
-    COST_CENTER: 'text:' + $param_costcenter,
-    TERRAFORM_ACTION: 'text:apply'
-  })
-
-  $report = tag_value(@utility.current_instance(), "rs:terraform_out_url")
-  $last_ran = strftime(now(), "%Y-%m-%d %H:%M:%S UTC")
+define plan(@utility) return $report, $last_ran do
+  call action(@utility, "plan") retrieve $report, $last_ran
 end
 
-define destroy(@utility, $param_git_repo, $param_branch_name, $param_costcenter) return @utility, $report, $last_ran do
+define apply(@utility) return $report, $last_ran do
+  call action(@utility, "apply") retrieve $report, $last_ran
+end
+
+define destroy(@utility) return $report, $last_ran do
+  call action(@utility, "destroy") retrieve $report, $last_ran
+end
+
+define action(@utility, $action) return $report, $last_ran do
   call rs_st.run_script_inputs(@utility, "Terraform Execute", {
-    GIT_REPO: 'text:' + $param_git_repo,
-    BRANCH_NAME: 'text:' + $param_branch_name,
-    COST_CENTER: 'text:' + $param_costcenter,
-    TERRAFORM_ACTION: 'text:destroy'
+    TERRAFORM_ACTION: 'text:' + $action
   })
 
   $report = tag_value(@utility.current_instance(), "rs:terraform_out_url")

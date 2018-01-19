@@ -30,10 +30,10 @@ parameter "param_branch_name" do
   default "master"
 end
 
-parameter "param_costcenter" do 
+parameter "param_costcenter" do
   category "Accounting"
-  label "Cost Center" 
-  type "string" 
+  label "Cost Center"
+  type "string"
   allowed_values "Development", "QA", "Production"
   default "Development"
   operations "launch"
@@ -68,17 +68,27 @@ end
 # RESOURCE DEFINITIONS     #
 ############################
 
-resource 'utility', type: 'server' do
-  name 'utility'
-  cloud 'EC2 us-west-2'
-  datacenter 'us-west-2c'
-  instance_type 'm3.medium'
-  network "Default"
-  subnets 'default for us-west-2c'
-  security_groups 'default'
-  server_template find('Terraform', revision: 0)
-end
+#resource 'utility', type: 'server' do
+#  name 'utility'
+#  cloud 'AzureRM East US'
+#  datacenter ""
+#  instance_type 'D1'
+#  network "pft_arm_network"
+#  subnets 'default'
+#  security_groups 'default'
+#  server_template find('Terraform', revision: 0)
+#end
 
+ resource 'utility', type: 'server' do
+   name 'utility-aws'
+   cloud 'EC2 us-west-2'
+   datacenter 'us-west-2c'
+   instance_type 'm3.medium'
+   network "Default"
+   subnets 'default for us-west-2c'
+   security_groups 'default'
+   server_template find('Terraform', revision: 0)
+ end
 ####################
 # OPERATIONS       #
 ####################

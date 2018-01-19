@@ -31,7 +31,7 @@ terraform_action() {
   cd ~
 
   rm -rf terraform
-  auth_git_repo=${GIT_REPO:0:8}adamalex:${GITHUB_TOKEN}@${GIT_REPO:8}
+  auth_git_repo=${GIT_REPO:0:8}${GITHUB_USER}:${GITHUB_TOKEN}@${GIT_REPO:8}
   git clone --depth=1 --branch="$BRANCH_NAME" "$auth_git_repo" terraform
 
   (
@@ -44,8 +44,12 @@ terraform_action() {
     "destroy")
       terraform destroy -force -no-color
       ;;
+    "apply")
+      terraform apply -auto-approve -no-color
+      ;;
     *)
-      terraform "$1" -no-color
+	  logger -s -t RightScale "DEBUG::Starting terraform ${TERRAFORM_ACTION}::"
+      echo yes | terraform "$1" -no-color
       ;;
     esac
 

@@ -56,7 +56,7 @@ terraform_action() {
     if [ ! -z "$(git status --porcelain)" ]; then 
       git add .
       git commit -m "Update Terraform state after $1"
-      git push origin "$BRANCH_NAME" | sed -E 's/(https.+:).+(@.+)/\1<hidden credential>\2/g'
+      git push origin "$BRANCH_NAME" 2>&1 | sed -E 's/(https.+:).+(@.+)/\1<hidden credential>\2/g'
     fi
   )
 

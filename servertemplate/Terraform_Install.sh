@@ -61,24 +61,18 @@ terraform --version
 
 #choose which cli to install for which cloud
 if [[ $ARM_CLIENT_ID ]]; then
-        #Install Azure CLI
-    echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ trusty main" | \
-        sudo tee /etc/apt/sources.list.d/azure-cli.list
-    sudo apt-key adv --keyserver packages.microsoft.com --recv-keys 52E16F86FEE04B979B07E28DB02C46DF417A0893
-    sudo apt-get install apt-transport-https
-    sudo apt-get update && sudo apt-get install azure-cli
-    
+    #Install Azure ENV variables for terraform provider
     echo "Configuring Azure Authentication ENV Variables"
     mkdir -p ~/.azure
     cat > ~/.azure/credentials.env <<EOF
 export ARM_CLIENT_ID=${ARM_CLIENT_ID}
-export ARM_CLIENT_SECRE${ARM_CLIENT_SECRET}
+export ARM_CLIENT_SECRET=${ARM_CLIENT_SECRET}
 export ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
 export ARM_TENANT_ID=${ARM_TENANT_ID}
 EOF
     chmod 550 ~/.azure/credentials.env
     source ~/.azure/credentials.env
-    
+
 elif [[ $AWS_ACCESS_KEY_ID ]];then
     echo "Configuring AWS authentication..."
     mkdir -p ~/.aws

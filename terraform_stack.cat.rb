@@ -13,10 +13,10 @@ This CloudApp provides state preservation, an audited workflow, and centralized 
 ---"
 
 import "pft/server_templates_utilities", as: "rs_st"
-import "bur/parameters"
-import "bur/mappings"
-import "bur/conditions"
-import "bur/resources", as: "common_resources"
+import "pft/parameters"
+import "pft/mappings"
+import "pft/conditions"
+import "pft/resources", as: "common_resources"
 
 ##################
 # User inputs    #
@@ -26,7 +26,7 @@ parameter "param_git_repo" do
   type "string"
   label "Git Repo"
   category "Settings"
-  default "https://github.com/Burwood/terraform-rightscale.git"
+  default "https://github.com/adamalex/terraform_sample.git"
 end
 
 parameter "param_branch_name" do
